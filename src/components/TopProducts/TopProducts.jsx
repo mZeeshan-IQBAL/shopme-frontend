@@ -3,11 +3,12 @@ import React, { useState, useEffect } from "react";
 import { FaStar, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 
-const BACKEND_URL = "http://localhost:3000"; // ✅ Your running backend
+// ✅ Use environment variable instead of localhost
+const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL;
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
-  const halfStar = rating % 1 !== 0;
+  const halfStar = rating % 1 !== 0; // true if there's a decimal
   return (
     <div className="flex items-center gap-1">
       {[...Array(fullStars)].map((_, i) => (
@@ -101,7 +102,7 @@ const TopProducts = () => {
               {/* Image - Increased size */}
               <div className="flex justify-center h-48 md:h-56 items-center">
                 <img
-                  src={`${BACKEND_URL}${product.img}`} // ✅ Dynamic image from backend
+                  src={`${BACKEND_URL}${product.img}`} // ✅ Now uses dynamic backend URL
                   alt={product.title}
                   className="max-w-[180px] md:max-w-[200px] max-h-[140px] md:max-h-[160px] object-contain block mx-auto transform transition-transform duration-300 drop-shadow-md group-hover:scale-110"
                   loading="lazy"

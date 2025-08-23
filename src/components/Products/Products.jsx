@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { FaStar, FaStarHalfAlt, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 
-const BACKEND_URL = "http://localhost:3000"; // Your backend server
+// ✅ Use environment variable
+const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL;
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -25,7 +26,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [added, setAdded] = useState({}); // Track "Added" state per product
+  const [added, setAdded] = useState({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -78,8 +79,7 @@ const Products = () => {
             Products
           </h1>
           <p data-aos="fade-up" className="text-sm text-gray-500">
-            Discover our most loved items handpicked based on your style and
-            preferences.
+            Discover our most loved items handpicked based on your style and preferences.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ const Products = () => {
                 className="bg-white shadow-md rounded-xl p-3 hover:shadow-xl transition-transform duration-300 hover:-translate-y-2 w-[180px] group"
               >
                 <img
-                  src={`${BACKEND_URL}${data.img}`} // ✅ Dynamic image from backend
+                  src={`${BACKEND_URL}${data.img}`} // ✅ Now uses correct backend URL
                   alt={data.title}
                   className="h-[220px] w-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                 />

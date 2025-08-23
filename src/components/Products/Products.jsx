@@ -4,7 +4,7 @@ import { FaStar, FaStarHalfAlt, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 
 // ✅ Use environment variable
-const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || "http://localhost:3000";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 
 const renderStars = (rating) => {

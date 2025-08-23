@@ -4,9 +4,7 @@ import { FaStar, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 
 // ✅ Use environment variable instead of localhost
-const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || "http://localhost:3000";
-
-
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
   const halfStar = rating % 1 !== 0; // true if there's a decimal

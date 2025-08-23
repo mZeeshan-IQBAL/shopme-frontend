@@ -9,7 +9,11 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const Cart = ({ onClose }) => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
   const [isCheckout, setIsCheckout] = useState(false); // Show form
-  const [formData, setFormData] = useState({ name: "", email: "", address: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    address: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -34,7 +38,10 @@ const Cart = ({ onClose }) => {
           quantity: item.quantity,
         })),
         ...formData,
-        totalPrice: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        totalPrice: cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        ),
       });
 
       console.log("Order placed successfully:", response.data);
@@ -53,16 +60,25 @@ const Cart = ({ onClose }) => {
     }
   };
 
-  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   // ✅ Success Screen
   if (success) {
     return (
       <div className="fixed top-0 right-0 h-full w-[350px] bg-white shadow-lg p-4 z-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-green-600">🎉 Order Confirmed!</h2>
-          <p className="mt-2">Thank you, <strong>{formData.name}</strong>!</p>
-          <p>We've sent a confirmation to <em>{formData.email}</em>.</p>
+          <h2 className="text-2xl font-bold text-green-600">
+            🎉 Order Confirmed!
+          </h2>
+          <p className="mt-2">
+            Thank you, <strong>{formData.name}</strong>!
+          </p>
+          <p>
+            We've sent a confirmation to <em>{formData.email}</em>.
+          </p>
           <p className="mt-4 text-sm text-gray-500">Redirecting shortly...</p>
         </div>
       </div>
@@ -86,7 +102,9 @@ const Cart = ({ onClose }) => {
         <form onSubmit={handleCheckout} className="space-y-4">
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Full Name
+            </label>
             <input
               type="text"
               name="name"
@@ -100,7 +118,9 @@ const Cart = ({ onClose }) => {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               name="email"
@@ -114,7 +134,9 @@ const Cart = ({ onClose }) => {
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Shipping Address</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Shipping Address
+            </label>
             <textarea
               name="address"
               value={formData.address}
@@ -137,7 +159,9 @@ const Cart = ({ onClose }) => {
                 </li>
               ))}
             </ul>
-            <p className="font-bold mt-2 text-lg">Total: ₹{totalPrice.toLocaleString()}</p>
+            <p className="font-bold mt-2 text-lg">
+              Total: ₹{totalPrice.toLocaleString()}
+            </p>
           </div>
 
           {/* Submit Button */}

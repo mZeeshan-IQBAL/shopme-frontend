@@ -6,6 +6,7 @@ import { useCart } from "../../context/CartContext";
 // ✅ Use environment variable
 const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL || "http://localhost:3000";
 
+
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;

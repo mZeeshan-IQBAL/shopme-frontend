@@ -1,102 +1,128 @@
-import React from "react";
-import Img1 from "../../assets/women/women.png";
-import Img2 from "../../assets/women/women2.jpg";
-import Img3 from "../../assets/women/women3.jpg";
-import Img4 from "../../assets/women/women4.jpg";
-import { FaStar } from "react-icons/fa6";
+// src/components/Products.jsx
+import React, { useState, useEffect } from "react";
+import { FaStar, FaStarHalfAlt, FaShoppingCart } from "react-icons/fa";
+import { useCart } from "../../context/CartContext";
 
-const ProductsData = [
-  {
-    id: 1,
-    img: Img1,
-    title: "Women Ethnic",
-    rating: 5.0,
-    color: "white",
-    aosDelay: "0",
-  },
-  {
-    id: 2,
-    img: Img2,
-    title: "Women western",
-    rating: 4.5,
-    color: "Red",
-    aosDelay: "200",
-  },
-  {
-    id: 3,
-    img: Img3,
-    title: "Goggles",
-    rating: 4.7,
-    color: "brown",
-    aosDelay: "400",
-  },
-  {
-    id: 4,
-    img: Img4,
-    title: "Printed T-Shirt",
-    rating: 4.4,
-    color: "Yellow",
-    aosDelay: "600",
-  },
-  {
-    id: 5,
-    img: Img2,
-    title: "Fashin T-Shirt",
-    rating: 4.5,
-    color: "Pink",
-    aosDelay: "800",
-  },
-];
+const BACKEND_URL = "http://localhost:3000"; // Your backend server
+
+const renderStars = (rating) => {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+
+  return (
+    <div className="flex items-center gap-1">
+      {[...Array(fullStars)].map((_, i) => (
+        <FaStar key={i} className="text-yellow-400" />
+      ))}
+      {hasHalfStar && <FaStarHalfAlt className="text-yellow-400" />}
+      <span className="ml-1 text-sm text-gray-600">{rating}</span>
+    </div>
+  );
+};
 
 const Products = () => {
+  const { addToCart } = useCart();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [added, setAdded] = useState({}); // Track "Added" state per product
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/products`);
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err.message);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    setAdded((prev) => ({ ...prev, [product.id]: true }));
+    setTimeout(() => {
+      setAdded((prev) => ({ ...prev, [product.id]: false }));
+    }, 1500);
+  };
+
+  if (loading)
+    return (
+      <div className="mt-14 text-center">
+        <p className="text-lg text-gray-600">Loading products...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="mt-14 text-center">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+
   return (
     <div className="mt-14 mb-12">
-      <div className="container">
-        {/* Header section */}
+      <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-10 max-w-[600px] mx-auto">
-          <p data-aos="fade-up" className="text-sm text-primary">
+          <p data-aos="fade-up" className="text-sm text-primary font-medium">
             Top Selling Products for you
           </p>
           <h1 data-aos="fade-up" className="text-3xl font-bold">
             Products
           </h1>
-          <p data-aos="fade-up" className="text-xs text-gray-400">
-           Discover our most loved items handpicked based on your style and preferences.
+          <p data-aos="fade-up" className="text-sm text-gray-500">
+            Discover our most loved items handpicked based on your style and
+            preferences.
           </p>
         </div>
-        {/* Body section */}
-        <div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 place-items-center gap-5">
-            {/* card section */}
-            {ProductsData.map((data) => (
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 place-items-center gap-6">
+          {products.length === 0 ? (
+            <p>No products available</p>
+          ) : (
+            products.map((data) => (
               <div
+                key={data.id}
                 data-aos="fade-up"
                 data-aos-delay={data.aosDelay}
-                key={data.id}
-                className="space-y-3"
+                className="bg-white shadow-md rounded-xl p-3 hover:shadow-xl transition-transform duration-300 hover:-translate-y-2 w-[180px] group"
               >
                 <img
-                  src={data.img}
-                  alt=""
-                  className="h-[220px] w-[150px] object-cover rounded-md"
+                  src={`${BACKEND_URL}${data.img}`} // ✅ Dynamic image from backend
+                  alt={data.title}
+                  className="h-[220px] w-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                 />
-                <div>
-                  <h3 className="font-semibold">{data.title}</h3>
-                  <p className="text-sm text-gray-600">{data.color}</p>
-                  <div className="flex items-center gap-1">
-                    <FaStar className="text-yellow-400" />
-                    <span>{data.rating}</span>
-                  </div>
+                <div className="mt-3 space-y-1">
+                  <h3 className="font-semibold text-gray-800">{data.title}</h3>
+                  <p className="text-sm text-gray-500">{data.color}</p>
+                  <p className="text-sm font-medium text-gray-800">
+                    Rs. {data.price.toLocaleString()}
+                  </p>
+                  {renderStars(data.rating)}
                 </div>
+                <button
+                  className="mt-4 flex items-center gap-2 bg-primary hover:scale-105 disabled:scale-100 disabled:opacity-70 text-white py-2 px-6 rounded-full transition-transform duration-300 group-hover:bg-black group-hover:text-primary disabled:cursor-not-allowed"
+                  onClick={() => handleAddToCart(data)}
+                  disabled={added[data.id]}
+                >
+                  {added[data.id] ? (
+                    "Added!"
+                  ) : (
+                    <>
+                      <FaShoppingCart size={16} /> Add to Cart
+                    </>
+                  )}
+                </button>
               </div>
-            ))}
-          </div>
-          {/* view all button */}
-          <div className="flex justify-center">
-            <button className="text-center mt-10 cursor-pointer bg-primary text-white py-1 px-5 rounded-md">
-              View All Button
-            </button>
-          </div>
+            ))
+          )}
         </div>
       </div>
     </div>

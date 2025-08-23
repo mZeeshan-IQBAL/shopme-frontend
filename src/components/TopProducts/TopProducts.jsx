@@ -1,94 +1,148 @@
-import React from "react";
-import Img1 from "../../assets/shirt/shirt.png";
-import Img2 from "../../assets/shirt/shirt2.png";
-import Img3 from "../../assets/shirt/shirt3.png";
-import { FaStar } from "react-icons/fa";
+// src/components/TopProducts.jsx
+import React, { useState, useEffect } from "react";
+import { FaStar, FaShoppingCart } from "react-icons/fa";
+import { useCart } from "../../context/CartContext";
 
-const ProductsData = [
-  {
-    id: 1,
-    img: Img1,
-    title: "Casual Wear",
-    description:
-      "Cotton Linen Shirt MN-CS-SS24-044",
-  },
-  {
-    id: 2,
-    img: Img2,
-    title: "Printed shirt",
-    description:
-      "Printed Shirt MN-PS-SS24-045",
-  },
-  {
-    id: 3,
-    img: Img3,
-    title: "Women shirt",
-    description:
-      "Printed Shirt WM-PS-SS24-046",
-  },
-];
+const BACKEND_URL = "http://localhost:3000"; // ✅ Your running backend
 
-const TopProducts = ({ handleOrderPopup }) => {
+const renderStars = (rating) => {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 !== 0;
   return (
-    <div>
-      <div className="container">
-        {/* Header section */}
-        <div className="text-left mb-24">
-          <p data-aos="fade-up" className="text-sm text-primary">
-            Top Rated Products for you
-          </p>
-          <h1 data-aos="fade-up" className="text-3xl font-bold">
-            Best Products
-          </h1>
-          <p data-aos="fade-up" className="text-xs text-gray-400">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sit
-            asperiores modi Sit asperiores modi
-          </p>
-        </div>
+    <div className="flex items-center gap-1">
+      {[...Array(fullStars)].map((_, i) => (
+        <FaStar key={i} className="text-yellow-400" />
+      ))}
+      {halfStar && <FaStar className="text-yellow-300 opacity-70" />}
+      <span className="ml-1 text-sm text-gray-600">{rating}</span>
+    </div>
+  );
+};
 
-        {/* Body section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 md:gap-5 place-items-center">
-          {ProductsData.map((data) => (
+const TopProducts = () => {
+  const { addToCart } = useCart();
+  const [topProducts, setTopProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [added, setAdded] = useState({}); // Track "Added!" state
+
+  useEffect(() => {
+    const fetchTopProducts = async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/top-products`);
+        if (!res.ok) throw new Error("Failed to fetch top products");
+        const data = await res.json();
+        setTopProducts(data);
+      } catch (err) {
+        console.error("Error fetching top products:", err.message);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopProducts();
+  }, []);
+
+  const handleAddToCart = (product) => {
+    addToCart(product);
+    setAdded((prev) => ({ ...prev, [product.id]: true }));
+    // Reset "Added!" state after 1.5 seconds
+    setTimeout(() => {
+      setAdded((prev) => {
+        const updated = { ...prev };
+        delete updated[product.id]; // Clean up key
+        return updated;
+      });
+    }, 1500);
+  };
+
+  if (loading)
+    return (
+      <section className="container mx-auto px-4 lg:px-8 mt-14 mb-12 text-center">
+        <p className="text-lg text-gray-600">Loading top products...</p>
+      </section>
+    );
+
+  if (error)
+    return (
+      <section className="container mx-auto px-4 lg:px-8 mt-14 mb-12 text-center">
+        <p className="text-red-500">⚠️ Failed to load products: {error}</p>
+      </section>
+    );
+
+  return (
+    <section className="container mx-auto px-4 lg:px-8 mt-14 mb-12">
+      {/* Header */}
+      <div className="text-center mb-10 max-w-[600px] mx-auto">
+        <p data-aos="fade-up" className="text-sm text-primary font-medium">
+          Top Rated Products for You
+        </p>
+        <h2 data-aos="fade-up" className="text-3xl font-bold mt-1">
+          Best Products
+        </h2>
+        <p data-aos="fade-up" className="text-xs text-gray-400 mt-2">
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sit asperiores modi.
+        </p>
+      </div>
+
+      {/* Products Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-10 place-items-center">
+        {topProducts.length === 0 ? (
+          <p>No top products available.</p>
+        ) : (
+          topProducts.map((product) => (
             <div
-              key={data.id} // ✅ Unique key added here
+              key={product.id}
               data-aos="zoom-in"
-              className="rounded-2xl bg-white dark:bg-gray-800 hover:bg-black/80 dark:hover:bg-primary hover:text-white relative shadow-xl duration-300 group max-w-[300px]"
+              data-aos-delay={product.aosDelay}
+              className="rounded-2xl bg-white dark:bg-gray-800 hover:bg-black/80 dark:hover:bg-primary hover:text-white relative shadow-xl transition-transform duration-300 group max-w-[320px] transform overflow-hidden"
             >
-              {/* image section */}
-              <div className="h-[100px]">
+              {/* Image - Increased size */}
+              <div className="flex justify-center h-48 md:h-56 items-center">
                 <img
-                  src={data.img}
-                  alt=""
-                  className="max-w-[140px] block mx-auto transform -translate-y-20 group-hover:scale-105 duration-300 drop-shadow-md"
+                  src={`${BACKEND_URL}${product.img}`} // ✅ Dynamic image from backend
+                  alt={product.title}
+                  className="max-w-[180px] md:max-w-[200px] max-h-[140px] md:max-h-[160px] object-contain block mx-auto transform transition-transform duration-300 drop-shadow-md group-hover:scale-110"
+                  loading="lazy"
                 />
               </div>
 
-              {/* details section */}
-              <div className="p-4 text-center">
-                {/* star rating */}
-                <div className="w-full flex items-center justify-center gap-1">
-                  <FaStar className="text-yellow-500" />
-                  <FaStar className="text-yellow-500" />
-                  <FaStar className="text-yellow-500" />
-                  <FaStar className="text-yellow-500" />
-                </div>
-
-                <h1 className="text-xl font-bold">{data.title}</h1>
-                <p className="text-gray-500 group-hover:text-white duration-300 text-sm line-clamp-2">
-                  {data.description}
-                </p>
-                <button
-                  className="bg-primary hover:scale-105 duration-300 text-white py-1 px-4 rounded-full mt-4 group-hover:bg-white group-hover:text-primary"
-                  onClick={handleOrderPopup}
+              {/* Details */}
+              <div className="p-5 text-center flex flex-col items-center">
+                {renderStars(product.rating)}
+                <h3 className="text-xl font-bold mt-2">{product.title}</h3>
+                <p
+                  className="text-gray-500 group-hover:text-white text-sm line-clamp-2"
+                  title={product.description}
                 >
-                  Order Now
+                  {product.description}
+                </p>
+                <p className="text-sm font-medium mt-1 group-hover:text-white">
+                  Rs. {product.price.toLocaleString()}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => handleAddToCart(product)}
+                  disabled={added[product.id]}
+                  aria-label={added[product.id] ? "Item added to cart" : `Add ${product.title} to cart`}
+                  className="mt-4 flex items-center gap-2 bg-primary hover:scale-105 disabled:scale-100 disabled:opacity-70 text-white py-2 px-6 rounded-full transition-transform duration-300 group-hover:bg-white group-hover:text-primary disabled:cursor-not-allowed"
+                >
+                  {added[product.id] ? (
+                    "Added!"
+                  ) : (
+                    <>
+                      <FaShoppingCart size={16} /> Add to Cart
+                    </>
+                  )}
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          ))
+        )}
       </div>
-    </div>
+    </section>
   );
 };
 

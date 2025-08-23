@@ -1,14 +1,13 @@
 // src/components/Cart.jsx
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import axios from "axios";
 
 // ✅ Use environment variable
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 const Cart = ({ onClose }) => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
-  const [isCheckout, setIsCheckout] = useState(false); // Show form
+  const [isCheckout, setIsCheckout] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,62 +22,67 @@ const Cart = ({ onClose }) => {
 
   const handleCheckout = async (e) => {
     e.preventDefault();
+
     if (!formData.name || !formData.email || !formData.address) {
       alert("Please fill all fields");
       return;
     }
 
     setIsSubmitting(true);
+
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/orders`, {
-        items: cart.map((item) => ({
-          id: item.id,
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-        })),
-        ...formData,
-        totalPrice: cart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        ),
+      const response = await fetch(`${BACKEND_URL}/api/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: cart.map((item) => ({
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            quantity: item.quantity,
+            img: item.img, // ✅ CRITICAL: Add this to fix 500 error
+          })),
+          ...formData,
+          totalPrice: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        }),
       });
 
-      console.log("Order placed successfully:", response.data);
+      // Check if response is OK (200-299)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("✅ Order placed successfully:", result);
+
       setSuccess(true);
       clearCart();
 
-      // Auto-close after 2 seconds
+      // Close after 2 seconds
       setTimeout(() => {
         onClose();
       }, 2000);
     } catch (error) {
-      console.error("Error placing order:", error);
+      console.error("❌ Error placing order:", error);
       alert("Failed to place order. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const totalPrice = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
+  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   // ✅ Success Screen
   if (success) {
     return (
       <div className="fixed top-0 right-0 h-full w-[350px] bg-white shadow-lg p-4 z-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-green-600">
-            🎉 Order Confirmed!
-          </h2>
-          <p className="mt-2">
-            Thank you, <strong>{formData.name}</strong>!
-          </p>
-          <p>
-            We've sent a confirmation to <em>{formData.email}</em>.
-          </p>
+          <h2 className="text-2xl font-bold text-green-600">🎉 Order Confirmed!</h2>
+          <p className="mt-2">Thank you, <strong>{formData.name}</strong>!</p>
+          <p>We've sent a confirmation to <em>{formData.email}</em>.</p>
           <p className="mt-4 text-sm text-gray-500">Redirecting shortly...</p>
         </div>
       </div>
@@ -102,9 +106,7 @@ const Cart = ({ onClose }) => {
         <form onSubmit={handleCheckout} className="space-y-4">
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Full Name</label>
             <input
               type="text"
               name="name"
@@ -118,9 +120,7 @@ const Cart = ({ onClose }) => {
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               name="email"
@@ -134,9 +134,7 @@ const Cart = ({ onClose }) => {
 
           {/* Address */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Shipping Address
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Shipping Address</label>
             <textarea
               name="address"
               value={formData.address}
@@ -159,9 +157,7 @@ const Cart = ({ onClose }) => {
                 </li>
               ))}
             </ul>
-            <p className="font-bold mt-2 text-lg">
-              Total: ₹{totalPrice.toLocaleString()}
-            </p>
+            <p className="font-bold mt-2 text-lg">Total: ₹{totalPrice.toLocaleString()}</p>
           </div>
 
           {/* Submit Button */}

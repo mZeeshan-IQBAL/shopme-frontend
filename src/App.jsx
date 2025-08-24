@@ -1,4 +1,8 @@
+// App.jsx
 import React, { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Main Components
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Products from "./components/Products/Products";
@@ -8,6 +12,12 @@ import Subscribe from "./components/Subscribe/Subscribe";
 import Testimonials from "./components/Testimonials/Testimonials";
 import Footer from "./components/Footer/Footer";
 import Popup from "./components/Popup/Popup";
+
+// Admin Components (create these in src/pages/)
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+
+// Context
 import { CartProvider } from "./context/CartContext";
 
 const App = () => {
@@ -24,17 +34,34 @@ const App = () => {
 
   return (
     <CartProvider>
-      <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
-        <Navbar />
-        <Hero />
-        <Products />
-        <TopProducts />
-        <Banner />
-        <Subscribe />
-        <Testimonials />
-        <Footer />
-        <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
-      </div>
+      <Routes>
+        {/* Public Shop Routes */}
+        <Route
+          path="/"
+          element={
+            <>
+              <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
+                <Navbar />
+                <Hero />
+                <Products />
+                <TopProducts />
+                <Banner />
+                <Subscribe />
+                <Testimonials />
+                <Footer />
+                <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
+              </div>
+            </>
+          }
+        />
+
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+
+        {/* Optional: Redirect any unknown route to home */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </CartProvider>
   );
 };

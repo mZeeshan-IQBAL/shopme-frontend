@@ -1,13 +1,15 @@
 // src/components/TopProducts.jsx
+// src/components/TopProducts.jsx
 import React, { useState, useEffect } from "react";
 import { FaStar, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 
-// ✅ Use environment variable instead of localhost
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
-  const halfStar = rating % 1 !== 0; // true if there's a decimal
+  const halfStar = rating % 1 !== 0;
+
   return (
     <div className="flex items-center gap-1">
       {[...Array(fullStars)].map((_, i) => (
@@ -24,7 +26,7 @@ const TopProducts = () => {
   const [topProducts, setTopProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [added, setAdded] = useState({}); // Track "Added!" state
+  const [added, setAdded] = useState({});
 
   useEffect(() => {
     const fetchTopProducts = async () => {
@@ -47,14 +49,17 @@ const TopProducts = () => {
   const handleAddToCart = (product) => {
     addToCart(product);
     setAdded((prev) => ({ ...prev, [product.id]: true }));
-    // Reset "Added!" state after 1.5 seconds
     setTimeout(() => {
       setAdded((prev) => {
         const updated = { ...prev };
-        delete updated[product.id]; // Clean up key
+        delete updated[product.id];
         return updated;
       });
     }, 1500);
+  };
+
+  const getImageUrl = (imgPath) => {
+    return imgPath.startsWith('http') ? imgPath : `${BACKEND_URL}${imgPath}`;
   };
 
   if (loading)
@@ -101,7 +106,7 @@ const TopProducts = () => {
               {/* Image - Increased size */}
               <div className="flex justify-center h-48 md:h-56 items-center">
                 <img
-                  src={`${BACKEND_URL}${product.img}`} // ✅ Now uses dynamic backend URL
+                  src={getImageUrl(product.img)}
                   alt={product.title}
                   className="max-w-[180px] md:max-w-[200px] max-h-[140px] md:max-h-[160px] object-contain block mx-auto transform transition-transform duration-300 drop-shadow-md group-hover:scale-110"
                   loading="lazy"

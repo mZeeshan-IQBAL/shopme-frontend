@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaStar, FaStarHalfAlt, FaShoppingCart } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 
-// ✅ Use environment variable
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -55,6 +53,10 @@ const Products = () => {
     }, 1500);
   };
 
+  const getImageUrl = (imgPath) => {
+    return imgPath.startsWith('http') ? imgPath : `${BACKEND_URL}${imgPath}`;
+  };
+
   if (loading)
     return (
       <div className="mt-14 text-center">
@@ -96,7 +98,7 @@ const Products = () => {
                 className="bg-white shadow-md rounded-xl p-3 hover:shadow-xl transition-transform duration-300 hover:-translate-y-2 w-[180px] group"
               >
                 <img
-                  src={`${BACKEND_URL}${data.img}`} // ✅ Now uses correct backend URL
+                  src={getImageUrl(data.img)}
                   alt={data.title}
                   className="h-[220px] w-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                 />

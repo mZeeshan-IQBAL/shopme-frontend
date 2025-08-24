@@ -1,19 +1,22 @@
+// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  // Remove `base` unless you're deploying to a subpath
-  base: '/', // ✅ Default — serves from root
+  base: '/',
 
-  plugins: [react()],
+  plugins: [
+    react({
+      // Enable JSX transform
+      jsx: 'automatic',
+    }),
+  ],
 
-  // Optional: Add build settings
   build: {
-    outDir: 'dist', // ✅ Vercel expects this
+    outDir: 'dist',
     sourcemap: true,
   },
 
-  // Only used in dev (localhost)
   server: {
     port: 5173,
     proxy: {
@@ -23,5 +26,22 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+
+  // ✅ Critical Fix: Handle .js files with JSX
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx', // ← This is key
+      },
+      // Ensure .js files are resolved correctly
+      resolveExtensions: ['.js', '.jsx', '.ts', '.tsx'],
+    },
+  },
+
+  // ✅ Add resolve to help Vite recognize file extensions
+  resolve: {
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
   },
 });

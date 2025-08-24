@@ -13,7 +13,7 @@ import Testimonials from "./components/Testimonials/Testimonials";
 import Footer from "./components/Footer/Footer";
 import Popup from "./components/Popup/Popup";
 
-// Admin Components (create these in src/pages/)
+// Admin Components
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -34,13 +34,14 @@ const App = () => {
 
   return (
     <CartProvider>
-      <Routes>
-        {/* Public Shop Routes */}
-        <Route
-          path="/"
-          element={
-            <>
-              <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
+      {/* This div wraps the whole app UI */}
+      <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
+        <Routes>
+          {/* Public Shop Route */}
+          <Route
+            path="/"
+            element={
+              <>
                 <Navbar />
                 <Hero />
                 <Products />
@@ -50,18 +51,18 @@ const App = () => {
                 <Testimonials />
                 <Footer />
                 <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
-              </div>
-            </>
-          }
-        />
+              </>
+            }
+          />
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
 
-        {/* Optional: Redirect any unknown route to home */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          {/* Redirect unknown routes */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
     </CartProvider>
   );
 };

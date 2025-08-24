@@ -1,4 +1,5 @@
 // src/pages/AdminDashboard.jsx
+// src/pages/AdminDashboard.jsx
 import React, { useState, useEffect } from "react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
@@ -29,18 +30,15 @@ const AdminDashboard = () => {
     setImage(e.target.files[0]);
   };
 
-  // Fetch orders on component mount
+  // Fetch orders
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/api/orders`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (!res.ok) throw new Error('Failed to fetch orders');
-
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
         const data = await res.json();
         setOrders(data);
       } catch (err) {
@@ -50,9 +48,7 @@ const AdminDashboard = () => {
       }
     };
 
-    if (token) {
-      fetchOrders();
-    }
+    if (token) fetchOrders();
   }, [token, BACKEND_URL]);
 
   const handleSubmit = async (e) => {
@@ -61,18 +57,41 @@ const AdminDashboard = () => {
     setError('');
     setSuccess('');
 
+    // Validate
+    if (!formData.id || !formData.title || !formData.rating || !formData.price || !image) {
+      setError('Please fill all required fields');
+      setLoading(false);
+      return;
+    }
+
+    const rating = parseFloat(formData.rating);
+    const price = parseFloat(formData.price);
+
+    if (isNaN(rating) || rating < 0 || rating > 5) {
+      setError('Rating must be between 0 and 5');
+      setLoading(false);
+      return;
+    }
+
+    if (isNaN(price) || price <= 0) {
+      setError('Price must be greater than 0');
+      setLoading(false);
+      return;
+    }
+
     const data = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (formData[key]) data.append(key, formData[key]);
-    });
-    if (image) data.append('image', image);
+    data.append('id', formData.id);
+    data.append('title', formData.title);
+    data.append('rating', rating);
+    data.append('color', formData.color);
+    data.append('price', price);
+    data.append('aosDelay', formData.aosDelay || '');
+    data.append('image', image);
 
     try {
       const res = await fetch(`${BACKEND_URL}/api/products`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: data
       });
 
@@ -98,10 +117,7 @@ const AdminDashboard = () => {
         <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin Login Required</h2>
           <p className="text-gray-600 mb-6">You must be logged in to access the dashboard.</p>
-          <a
-            href="/admin/login"
-            className="inline-block bg-primary text-white py-2 px-6 rounded-full hover:scale-105 transition-transform duration-200"
-          >
+          <a href="/admin/login" className="inline-block bg-primary text-white py-2 px-6 rounded-full hover:scale-105 transition-transform duration-200">
             Go to Login
           </a>
         </div>
@@ -112,112 +128,51 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-
-        {/* Header */}
-        <div className="bg-gray-800 text-white p-6 rounded-t-xl">
+        <div className="bg-gray-800 text-white p-6 rounded-t-xl relative">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-gray-300 mt-1">Manage products and view customer orders</p>
+          <button
+            onClick={() => {
+              localStorage.removeItem('adminToken');
+              window.location.href = '/admin/login';
+            }}
+            className="absolute top-6 right-6 bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded"
+          >
+            Logout
+          </button>
         </div>
 
-        {/* Messages */}
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 mt-6">
-            <p className="text-red-700">{error}</p>
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6 mt-6">
-            <p className="text-green-700 font-medium">{success}</p>
-          </div>
-        )}
+        {error && <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 mt-6"><p className="text-red-700">{error}</p></div>}
+        {success && <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6 mt-6"><p className="text-green-700 font-medium">{success}</p></div>}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 bg-white rounded-b-xl">
-
-          {/* Add Product Form */}
+          {/* Add Product */}
           <div>
             <h2 className="text-xl font-bold mb-4">Add New Product</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                name="id"
-                placeholder="Product ID"
-                value={formData.id}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                name="title"
-                placeholder="Product Title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                name="rating"
-                type="number"
-                step="0.1"
-                placeholder="Rating (e.g., 4.5)"
-                value={formData.rating}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                name="color"
-                placeholder="Color (optional)"
-                value={formData.color}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                name="price"
-                type="number"
-                placeholder="Price (in Rs)"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                name="aosDelay"
-                type="text"
-                placeholder="AOS Delay (e.g., 200)"
-                value={formData.aosDelay}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              />
+              <input name="id" placeholder="Product ID" value={formData.id} onChange={handleChange} required className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+              <input name="title" placeholder="Product Title" value={formData.title} onChange={handleChange} required className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+              <input name="rating" type="number" step="0.1" placeholder="Rating (e.g., 4.5)" value={formData.rating} onChange={handleChange} required className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+              <input name="color" placeholder="Color (optional)" value={formData.color} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+              <input name="price" type="number" placeholder="Price (in Rs)" value={formData.price} onChange={handleChange} required className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
+              <input name="aosDelay" type="text" placeholder="AOS Delay (e.g., 200)" value={formData.aosDelay} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary" />
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary file:text-white hover:file:bg-black"
-                />
-                {image && (
-                  <p className="mt-2 text-sm text-gray-600">Selected: <span className="font-medium">{image.name}</span></p>
-                )}
+                <input type="file" accept="image/*" onChange={handleImageChange} required className="w-full border border-gray-300 rounded-lg px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary file:text-white hover:file:bg-black" />
+                {image && <p className="mt-2 text-sm text-gray-600">Selected: <span className="font-medium">{image.name}</span></p>}
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary hover:bg-black text-white py-2 px-6 rounded-full font-medium transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2"
-              >
+              <button type="submit" disabled={loading} className="w-full bg-primary hover:bg-black text-white py-2 px-6 rounded-full font-medium transition-all duration-200 disabled:opacity-70 flex items-center justify-center gap-2">
                 {loading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Uploading...
                   </>
-                ) : (
-                  'Add Product'
-                )}
+                ) : 'Add Product'}
               </button>
             </form>
           </div>
 
-          {/* Orders List */}
+          {/* Orders */}
           <div>
             <h2 className="text-xl font-bold mb-4">Recent Orders</h2>
             {loadingOrders ? (
@@ -238,10 +193,8 @@ const AdminDashboard = () => {
                     <div className="mt-2">
                       <strong>Items:</strong>
                       <ul className="list-disc list-inside text-sm">
-                        {order.items.map((item, index) => (
-                          <li key={index}>
-                            {item.title} × {item.quantity} = ₹{item.price * item.quantity}
-                          </li>
+                        {order.items.map((item, i) => (
+                          <li key={i}>{item.title} × {item.quantity} = ₹{item.price * item.quantity}</li>
                         ))}
                       </ul>
                     </div>
@@ -250,17 +203,10 @@ const AdminDashboard = () => {
               </div>
             )}
           </div>
-
         </div>
 
-        {/* Back Link */}
         <div className="p-6 pt-0">
-          <a
-            href="/"
-            className="text-primary hover:underline text-sm font-medium"
-          >
-            ← Back to Store
-          </a>
+          <a href="/" className="text-primary hover:underline text-sm font-medium">← Back to Store</a>
         </div>
       </div>
     </div>

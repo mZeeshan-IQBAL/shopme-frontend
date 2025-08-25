@@ -1,5 +1,6 @@
 // src/pages/Profile.jsx
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
 
@@ -33,14 +34,14 @@ export default function Profile() {
     };
 
     if (token) fetchData();
-  }, [token, BACKEND_URL]);
+  }, [token]);
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="text-center">
           <p className="text-gray-600 mb-4">You must be logged in to view your profile.</p>
-          <a href="/login" className="text-primary hover:underline">Login here</a>
+          <Link to="/login" className="text-primary hover:underline">Login here</Link>
         </div>
       </div>
     );
@@ -54,10 +55,25 @@ export default function Profile() {
     );
   }
 
+  const handleLogout = () => {
+    if (window.confirm("Log out?")) {
+      localStorage.removeItem('token');
+      window.location.href = '/';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">My Profile</h1>
+        <div className="flex justify-between items-start mb-6">
+          <h1 className="text-3xl font-bold">My Profile</h1>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm"
+          >
+            Logout
+          </button>
+        </div>
 
         {/* User Info */}
         <div className="bg-white p-6 rounded-xl shadow mb-6">
@@ -76,10 +92,24 @@ export default function Profile() {
             <div className="space-y-4">
               {orders.map((order) => (
                 <div key={order._id} className="border rounded-lg p-4">
-                  <p><strong>Order ID:</strong> {order._id.slice(-6)}</p>
-                  <p><strong>Total:</strong> ₹{order.totalPrice}</p>
-                  <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
-                  <p><strong>Status:</strong> <span className="text-blue-600">{order.status || 'pending'}</span></p>
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <div>
+                      <p><strong>Order ID:</strong> {order._id.slice(-6)}</p>
+                      <p><strong>Total:</strong> ₹{order.totalPrice.toLocaleString()}</p>
+                      <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <p><strong>Status:</strong> <span className="text-blue-600">{order.status || 'pending'}</span></p>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <strong>Items:</strong>
+                    <ul className="list-disc list-inside text-sm mt-1">
+                      {order.items.map((item, i) => (
+                        <li key={i}>{item.title} × {item.quantity}</li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               ))}
             </div>

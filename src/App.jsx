@@ -1,4 +1,4 @@
-// App.jsx
+// src/App.jsx
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
@@ -12,6 +12,11 @@ import Subscribe from "./components/Subscribe/Subscribe";
 import Testimonials from "./components/Testimonials/Testimonials";
 import Footer from "./components/Footer/Footer";
 import Popup from "./components/Popup/Popup";
+
+// Auth Components
+import Register from "./pages/Register";   // ← You created this
+import Login from "./pages/Login";         // ← Just added
+import Profile from "./pages/Profile";     // ← Coming soon
 
 // Admin Components
 import AdminLogin from "./pages/AdminLogin";
@@ -34,7 +39,6 @@ const App = () => {
 
   return (
     <CartProvider>
-      {/* This div wraps the whole app UI */}
       <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
         <Routes>
           {/* Public Shop Route */}
@@ -54,6 +58,11 @@ const App = () => {
               </>
             }
           />
+
+          {/* Customer Auth Routes */}
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
 
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />

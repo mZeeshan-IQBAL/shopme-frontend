@@ -1,9 +1,10 @@
 // src/pages/AdminDashboard.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AdminLayout from "../components/admin/AdminLayout";
 import ProductManagement from "../components/admin/ProductManagement";
 import TopProductManagement from "../components/admin/TopProductManagement";
 
+// ✅ Fixed: Removed trailing spaces
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
 
 export default function AdminDashboard() {
@@ -14,10 +15,14 @@ export default function AdminDashboard() {
 
   if (!token) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
         <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin Login Required</h2>
-          <a href="/admin/login" className="inline-block bg-primary text-white py-2 px-6 rounded-full hover:scale-105 transition-transform duration-200">
+          <p className="text-gray-600 mb-6">You must be logged in to access the dashboard.</p>
+          <a
+            href="/admin/login"
+            className="inline-block bg-primary text-white py-2 px-6 rounded-full hover:scale-105 transition-transform duration-200"
+          >
             Go to Login
           </a>
         </div>
@@ -26,7 +31,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <AdminLayout setError={setError} setSuccess={setSuccess}>
+    <AdminLayout>
       {/* Tabs */}
       <div className="border-b border-gray-300 mb-6">
         <nav className="flex space-x-8">
@@ -53,6 +58,18 @@ export default function AdminDashboard() {
         </nav>
       </div>
 
+      {/* Messages */}
+      {error && (
+        <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4">
+          <p className="text-green-700 font-medium">{success}</p>
+        </div>
+      )}
+
       {/* Content */}
       {activeTab === "products" && (
         <ProductManagement
@@ -70,18 +87,6 @@ export default function AdminDashboard() {
           setError={setError}
           setSuccess={setSuccess}
         />
-      )}
-
-      {/* Messages */}
-      {error && (
-        <div className="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
-          <p className="text-red-700">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mt-6 bg-green-50 border-l-4 border-green-400 p-4">
-          <p className="text-green-700 font-medium">{success}</p>
-        </div>
       )}
     </AdminLayout>
   );

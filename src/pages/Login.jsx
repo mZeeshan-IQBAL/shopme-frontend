@@ -20,7 +20,9 @@ export default function Login() {
     try {
       const res = await fetch('https://shopme-backend-production.up.railway.app/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(formData)
       });
 

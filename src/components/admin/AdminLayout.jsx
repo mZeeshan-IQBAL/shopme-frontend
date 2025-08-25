@@ -1,4 +1,4 @@
-// Simple layout wrapper
+// src/components/admin/AdminLayout.jsx
 export default function AdminLayout({ children }) {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');

@@ -20,12 +20,31 @@ export default function Profile() {
         const userData = await userRes.json();
         setUser(userData);
 
+        // Only fetch orders if user has an ID
+        if (!userData.id) {
+          console.warn("No user ID found");
+          return;
+        }
+
         // Fetch user orders
         const ordersRes = await fetch(`${BACKEND_URL}/api/orders/user/${userData.id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (!ordersRes.ok) {
+          console.error("Failed to fetch orders:", await ordersRes.text());
+          return;
+        }
+
         const ordersData = await ordersRes.json();
-        setOrders(ordersData);
+
+        // Ensure orders is an array
+        if (Array.isArray(ordersData)) {
+          setOrders(ordersData);
+        } else {
+          console.warn("Orders response is not an array:", ordersData);
+          setOrders([]);
+        }
       } catch (err) {
         console.error("Failed to load profile:", err);
       } finally {

@@ -1,4 +1,3 @@
-// src/components/Cart.jsx
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext";
 
@@ -25,7 +24,6 @@ const Cart = ({ onClose }) => {
 
     setIsSubmitting(true);
 
-    // Get userId from token (if logged in)
     const token = localStorage.getItem('token');
     let userId = null;
     if (token) {
@@ -63,9 +61,15 @@ const Cart = ({ onClose }) => {
       const result = await response.json();
       console.log("✅ Order placed:", result);
 
-      setSuccess(true);
+      setSuccess(true); // show confirmation
       clearCart();
-      onClose(); // Close cart immediately
+
+      // Automatically hide confirmation and close cart after 3 seconds
+      setTimeout(() => {
+        setSuccess(false);
+        onClose();
+      }, 3000);
+
     } catch (error) {
       console.error("❌ Error placing order:", error);
       alert("Failed to place order. Please try again.");

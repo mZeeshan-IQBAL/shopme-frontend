@@ -13,37 +13,19 @@ export default function Profile() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch user profile
         const userRes = await fetch(`${BACKEND_URL}/api/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const userData = await userRes.json();
         setUser(userData);
 
-        // Only fetch orders if user has an ID
-        if (!userData.id) {
-          console.warn("No user ID found");
-          return;
-        }
-
-        // Fetch user orders
-        const ordersRes = await fetch(`${BACKEND_URL}/api/orders/user/${userData.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!ordersRes.ok) {
-          console.error("Failed to fetch orders:", await ordersRes.text());
-          return;
-        }
-
-        const ordersData = await ordersRes.json();
-
-        // Ensure orders is an array
-        if (Array.isArray(ordersData)) {
+        // Fetch orders
+        if (userData.id) {
+          const ordersRes = await fetch(`${BACKEND_URL}/api/orders/user/${userData.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const ordersData = await ordersRes.json();
           setOrders(ordersData);
-        } else {
-          console.warn("Orders response is not an array:", ordersData);
-          setOrders([]);
         }
       } catch (err) {
         console.error("Failed to load profile:", err);
@@ -81,6 +63,9 @@ export default function Profile() {
     }
   };
 
+  // ✅ Safe date formatting
+  const joinedDate = user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown';
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -97,9 +82,9 @@ export default function Profile() {
         {/* User Info */}
         <div className="bg-white p-6 rounded-xl shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Personal Info</h2>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Joined:</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
+          <p><strong>Name:</strong> {user?.name || 'N/A'}</p>
+          <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
+          <p><strong>Joined:</strong> {joinedDate}</p>
         </div>
 
         {/* Order History */}
@@ -111,7 +96,7 @@ export default function Profile() {
             <div className="space-y-4">
               {orders.map((order) => (
                 <div key={order._id} className="border rounded-lg p-4">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
                     <div>
                       <p><strong>Order ID:</strong> {order._id.slice(-6)}</p>
                       <p><strong>Total:</strong> ₹{order.totalPrice.toLocaleString()}</p>

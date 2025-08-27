@@ -10,32 +10,50 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userRes = await fetch(`${BACKEND_URL}/api/auth/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const userData = await userRes.json();
-        setUser(userData);
+  const fetchData = async () => {
+    try {
+      const userRes = await fetch(`${BACKEND_URL}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const userData = await userRes.json();
+      setUser(userData);
 
-        // Fetch orders
-        if (userData.id) {
-          const ordersRes = await fetch(`${BACKEND_URL}/api/orders/user/${userData.id}`, {
+      if (userData.email) {
+        const ordersRes = await fetch(
+          `${BACKEND_URL}/api/orders/email/${encodeURIComponent(userData.email)}`,
+          {
             headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const ordersData = await ordersRes.json();
-          setOrders(ordersData);
-        }
-      } catch (err) {
-        console.error("Failed to load profile:", err);
-      } finally {
-        setLoading(false);
+          }
+        );
+        const ordersData = await ordersRes.json();
+        setOrders(Array.isArray(ordersData) ? ordersData : []);
+      }
+    } catch (err) {
+      console.error("Failed to load profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchData();
+    }
+
+    // ✅ Re-fetch when order is placed
+    const handleOrderPlaced = () => {
+      if (user?.email) {
+        setLoading(true);
+        fetchData();
       }
     };
 
-    if (token) fetchData();
-  }, [token]);
+    window.addEventListener('order-placed', handleOrderPlaced);
+
+    return () => {
+      window.removeEventListener('order-placed', handleOrderPlaced);
+    };
+  }, [token, user?.email]);
 
   if (!token) {
     return (
@@ -63,7 +81,6 @@ export default function Profile() {
     }
   };
 
-  // ✅ Safe date formatting
   const joinedDate = user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown';
 
   return (

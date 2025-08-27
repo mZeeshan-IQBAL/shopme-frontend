@@ -6,6 +6,7 @@ import DarkMode from "./DarkMode";
 import { FiShoppingBag } from "react-icons/fi";
 import Cart from "./Cart";
 import { useCart } from "../../context/CartContext";
+import { Link } from "react-router-dom"; // ✅ Added
 
 // ✅ Define backend URL
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
@@ -82,13 +83,13 @@ export default function Navbar() {
                     Hi, {user?.name || "User"}
                   </span>
 
-                  {/* ✅ Profile Button */}
-                  <a
-                    href="/profile"
+                  {/* ✅ Profile Button with Link */}
+                  <Link
+                    to="/profile"
                     className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-1 px-3 rounded transition"
                   >
                     Profile
-                  </a>
+                  </Link>
 
                   <button
                     onClick={handleLogout}
@@ -111,18 +112,18 @@ export default function Navbar() {
               ) : (
                 // ✅ Not logged in – show Login/Register
                 <div className="flex items-center gap-3">
-                  <a
-                    href="/login"
+                  <Link
+                    to="/login"
                     className="text-sm text-gray-700 hover:text-primary dark:text-gray-300"
                   >
                     Login
-                  </a>
-                  <a
-                    href="/register"
+                  </Link>
+                  <Link
+                    to="/register"
                     className="text-sm bg-primary hover:bg-black text-white py-1 px-3 rounded"
                   >
                     Register
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

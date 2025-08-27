@@ -96,16 +96,26 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-start mb-6">
-          <h1 className="text-3xl font-bold">My Profile</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          {/* Title */}
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">
+            My Profile
+          </h1>
+
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm"
+            className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md"
           >
             Logout
           </button>
-          <div className="text-center mt-4">
-            <Link to="/" className="text-gray-500 hover:underline text-sm">
+
+          {/* Back Link */}
+          <div className="mt-4 sm:mt-0 sm:ml-auto">
+            <Link
+              to="/"
+              className="text-gray-500 dark:text-gray-300 hover:text-primary hover:underline text-sm transition-colors"
+            >
               ← Back to Store
             </Link>
           </div>

@@ -1,5 +1,5 @@
 // src/components/Navbar/Navbar.jsx
-import React, { useState, useEffect } from "react"; // ✅ Added useEffect
+import React, { useState, useEffect } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import DarkMode from "./DarkMode";
@@ -7,7 +7,7 @@ import { FiShoppingBag } from "react-icons/fi";
 import Cart from "./Cart";
 import { useCart } from "../../context/CartContext";
 
-// ✅ Define BACKEND_URL
+// ✅ Define backend URL
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
 
 export default function Navbar() {
@@ -44,11 +44,11 @@ export default function Navbar() {
           console.error("Failed to fetch user:", err);
         }
       } else {
-        setUser(null); // ✅ Clear user when logged out
+        setUser(null); // Clear user when logged out
       }
     };
     fetchUser();
-  }, [token]); // ✅ Only re-run when token changes
+  }, [token, BACKEND_URL]);
 
   return (
     <div className="shadow-md bg-white dark:bg-slate-800 dark:text-white duration-200 relative z-40">
@@ -76,11 +76,20 @@ export default function Navbar() {
             {/* Auth Buttons */}
             <div className="flex items-center gap-3">
               {token ? (
-                // Customer logged in
+                // ✅ Customer logged in
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium">
-                    Hi, {user?.name || "User"} {/* ✅ Shows real name */}
+                    Hi, {user?.name || "User"}
                   </span>
+
+                  {/* ✅ Profile Button */}
+                  <a
+                    href="/profile"
+                    className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-1 px-3 rounded transition"
+                  >
+                    Profile
+                  </a>
+
                   <button
                     onClick={handleLogout}
                     className="text-sm text-gray-600 hover:text-primary dark:text-gray-300"
@@ -89,7 +98,7 @@ export default function Navbar() {
                   </button>
                 </div>
               ) : adminToken ? (
-                // Admin logged in
+                // ✅ Admin logged in
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium">Admin</span>
                   <button
@@ -100,7 +109,7 @@ export default function Navbar() {
                   </button>
                 </div>
               ) : (
-                // Not logged in – show Login/Register
+                // ✅ Not logged in – show Login/Register
                 <div className="flex items-center gap-3">
                   <a
                     href="/login"

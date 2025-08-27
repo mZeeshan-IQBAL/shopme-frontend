@@ -26,20 +26,32 @@ export default function AdminOrders({ BACKEND_URL, token }) {
   };
 
   const updateStatus = async (orderId, newStatus) => {
-    const res = await fetch(`${BACKEND_URL}/api/orders/${orderId}/status`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ status: newStatus }),
-    });
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-    if (res.ok) {
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || 'Failed to update status');
+      }
+
       const { order } = await res.json();
-      setOrders(orders.map(o => o._id === orderId ? order : o));
-    } else {
-      alert("Failed to update status");
+
+      // ✅ Functional update to avoid stale state
+      setOrders((prevOrders) =>
+        prevOrders.map((o) => (o._id === orderId ? { ...o, ...order } : o))
+      );
+
+      console.log("✅ Status updated successfully:", order.status);
+    } catch (err) {
+      console.error("❌ Error updating order status:", err);
+      alert("Failed to update status. Please try again.");
     }
   };
 
@@ -78,12 +90,12 @@ export default function AdminOrders({ BACKEND_URL, token }) {
                 <td className="border p-2">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium
-                      ${order.status === 'delivered' 
-                        ? 'bg-green-100 text-green-800' 
-                        : order.status === 'cancelled' 
-                        ? 'bg-red-100 text-red-800' 
-                        : order.status === 'pending' 
-                        ? 'bg-gray-100 text-gray-800' 
+                      ${order.status === 'delivered'
+                        ? 'bg-green-100 text-green-800'
+                        : order.status === 'cancelled'
+                        ? 'bg-red-100 text-red-800'
+                        : order.status === 'pending'
+                        ? 'bg-gray-100 text-gray-800'
                         : 'bg-yellow-100 text-yellow-800'
                       }`}
                   >

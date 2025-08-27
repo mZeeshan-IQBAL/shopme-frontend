@@ -9,7 +9,9 @@ import { useCart } from "../../context/CartContext";
 import { Link } from "react-router-dom"; // ✅ Added
 
 // ✅ Define backend URL
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
+const BACKEND_URL =
+  import.meta.env.VITE_BACKEND_URL ||
+  "https://shopme-backend-production.up.railway.app";
 
 export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -37,7 +39,7 @@ export default function Navbar() {
       if (token) {
         try {
           const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           });
           const userData = await res.json();
           setUser(userData);
@@ -86,7 +88,7 @@ export default function Navbar() {
                   {/* ✅ Profile Button with Link */}
                   <Link
                     to="/profile"
-                    className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 py-1 px-3 rounded transition"
+                    className="text-sm text-gray-600 hover:text-primary dark:text-gray-300"
                   >
                     Profile
                   </Link>

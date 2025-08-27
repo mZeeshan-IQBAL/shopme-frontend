@@ -1,5 +1,5 @@
 // src/components/Navbar/Navbar.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // ✅ Added useEffect
 import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import DarkMode from "./DarkMode";
@@ -7,23 +7,48 @@ import { FiShoppingBag } from "react-icons/fi";
 import Cart from "./Cart";
 import { useCart } from "../../context/CartContext";
 
-const Navbar = () => {
+// ✅ Define BACKEND_URL
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://shopme-backend-production.up.railway.app";
+
+export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
   const { cart } = useCart();
 
   const toggleCart = () => setCartOpen(!cartOpen);
 
   // Check login states
-  const token = localStorage.getItem('token');           // Customer token
-  const adminToken = localStorage.getItem('adminToken'); // Admin token
+  const token = localStorage.getItem("token"); // Customer token
+  const adminToken = localStorage.getItem("adminToken"); // Admin token
 
   const handleLogout = () => {
     if (window.confirm("Log out?")) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('adminToken');
-      window.location.href = '/';
+      localStorage.removeItem("token");
+      localStorage.removeItem("adminToken");
+      window.location.href = "/";
     }
   };
+
+  const [user, setUser] = useState(null);
+
+  // ✅ Fetch user data when token changes
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (token) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const userData = await res.json();
+          setUser(userData);
+        } catch (err) {
+          console.error("Failed to fetch user:", err);
+        }
+      } else {
+        setUser(null); // ✅ Clear user when logged out
+      }
+    };
+    fetchUser();
+  }, [token]); // ✅ Only re-run when token changes
 
   return (
     <div className="shadow-md bg-white dark:bg-slate-800 dark:text-white duration-200 relative z-40">
@@ -53,7 +78,9 @@ const Navbar = () => {
               {token ? (
                 // Customer logged in
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium">Hi, User</span>
+                  <span className="text-sm font-medium">
+                    Hi, {user?.name || "User"} {/* ✅ Shows real name */}
+                  </span>
                   <button
                     onClick={handleLogout}
                     className="text-sm text-gray-600 hover:text-primary dark:text-gray-300"
@@ -114,6 +141,4 @@ const Navbar = () => {
       {cartOpen && <Cart onClose={toggleCart} />}
     </div>
   );
-};
-
-export default Navbar;
+}

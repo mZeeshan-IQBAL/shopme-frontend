@@ -1,3 +1,4 @@
+// src/components/admin/AdminOrders.jsx
 import React, { useEffect, useState } from "react";
 
 export default function AdminOrders({ BACKEND_URL, token }) {
@@ -24,6 +25,24 @@ export default function AdminOrders({ BACKEND_URL, token }) {
     }
   };
 
+  const updateStatus = async (orderId, newStatus) => {
+    const res = await fetch(`${BACKEND_URL}/api/orders/${orderId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (res.ok) {
+      const { order } = await res.json();
+      setOrders(orders.map(o => o._id === orderId ? order : o));
+    } else {
+      alert("Failed to update status");
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -44,28 +63,48 @@ export default function AdminOrders({ BACKEND_URL, token }) {
               <th className="border p-2">Customer</th>
               <th className="border p-2">Email</th>
               <th className="border p-2">Total</th>
+              <th className="border p-2">Status</th>
+              <th className="border p-2">Actions</th>
               <th className="border p-2">Date</th>
-              <th className="border p-2">Items</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
-                <td className="border p-2">{order._id}</td>
+                <td className="border p-2">{order._id.slice(-6)}</td>
                 <td className="border p-2">{order.name}</td>
                 <td className="border p-2">{order.email}</td>
                 <td className="border p-2">₹{order.totalPrice}</td>
                 <td className="border p-2">
-                  {new Date(order.createdAt).toLocaleString()}
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium
+                      ${order.status === 'delivered' 
+                        ? 'bg-green-100 text-green-800' 
+                        : order.status === 'cancelled' 
+                        ? 'bg-red-100 text-red-800' 
+                        : order.status === 'pending' 
+                        ? 'bg-gray-100 text-gray-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                  >
+                    {order.status}
+                  </span>
                 </td>
                 <td className="border p-2">
-                  <ul>
-                    {order.items.map((item, idx) => (
-                      <li key={idx}>
-                        {item.title} x {item.quantity}
-                      </li>
-                    ))}
-                  </ul>
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateStatus(order._id, e.target.value)}
+                    className="p-1 border rounded text-sm"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </td>
+                <td className="border p-2">
+                  {new Date(order.createdAt).toLocaleString()}
                 </td>
               </tr>
             ))}

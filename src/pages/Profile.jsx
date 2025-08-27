@@ -96,28 +96,31 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           {/* Title */}
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             My Profile
           </h1>
 
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow-md"
-          >
-            Logout
-          </button>
-
-          {/* Back Link */}
-          <div className="mt-4 sm:mt-0 sm:ml-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 w-full sm:w-auto">
+            {/* Back to Store Link */}
             <Link
               to="/"
-              className="text-gray-500 dark:text-gray-300 hover:text-primary hover:underline text-sm transition-colors"
+              className="flex items-center text-gray-500 dark:text-gray-300 hover:text-primary hover:underline text-sm font-medium transition-colors duration-200"
             >
-              ← Back to Store
+              ← <span className="ml-1">Back to Store</span>
             </Link>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 
+                 shadow-sm hover:shadow focus:ring-2 focus:ring-red-300 focus:outline-none 
+                 transform hover:-translate-y-0.5 active:translate-y-0"
+            >
+              Logout
+            </button>
           </div>
         </div>
 

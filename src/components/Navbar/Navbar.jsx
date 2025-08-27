@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
-import { FiShoppingBag } from "react-icons/fi";
 import DarkMode from "./DarkMode";
+import { FiShoppingBag } from "react-icons/fi";
 import Cart from "./Cart";
 import { useCart } from "../../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // ✅ Added
 
+// ✅ Define backend URL
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
   "https://shopme-backend-production.up.railway.app";
@@ -15,10 +16,12 @@ const BACKEND_URL =
 export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
   const { cart } = useCart();
+
   const toggleCart = () => setCartOpen(!cartOpen);
 
-  const token = localStorage.getItem("token");
-  const adminToken = localStorage.getItem("adminToken");
+  // Check login states
+  const token = localStorage.getItem("token"); // Customer token
+  const adminToken = localStorage.getItem("adminToken"); // Admin token
 
   const handleLogout = () => {
     if (window.confirm("Log out?")) {
@@ -30,6 +33,7 @@ export default function Navbar() {
 
   const [user, setUser] = useState(null);
 
+  // ✅ Fetch user data when token changes
   useEffect(() => {
     const fetchUser = async () => {
       if (token) {
@@ -43,34 +47,33 @@ export default function Navbar() {
           console.error("Failed to fetch user:", err);
         }
       } else {
-        setUser(null);
+        setUser(null); // Clear user when logged out
       }
     };
     fetchUser();
-  }, [token]);
+  }, [token, BACKEND_URL]);
 
   return (
-    <div className="shadow-md bg-white dark:bg-slate-900 dark:text-white z-50 relative">
-      <div className="bg-primary/40 py-3">
+    <div className="shadow-md bg-white dark:bg-slate-800 dark:text-white duration-200 relative z-40">
+      <div className="bg-primary/40 py-2">
         <div className="container flex justify-between items-center">
           {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white"
-          >
-            <FiShoppingBag size={30} /> ShopMe
-          </Link>
+          <div>
+            <a href="/" className="font-bold text-xl flex items-center gap-1">
+              <FiShoppingBag size="30" /> ShopMe
+            </a>
+          </div>
 
-          {/* Right Side */}
+          {/* Right Side: Search, Cart, Auth, Dark Mode */}
           <div className="flex items-center gap-4">
-            {/* Search */}
-            <div className="relative hidden sm:block">
+            {/* Search Bar (Hidden on mobile) */}
+            <div className="relative group hidden sm:block">
               <input
                 type="text"
-                placeholder="Search products..."
-                className="transition-all duration-300 w-48 group-hover:w-64 rounded-lg border border-gray-300 py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-slate-800 dark:text-white"
+                placeholder="Search"
+                className="w-[200px] group-hover:w-[300px] transition-all duration-300 rounded-lg border border-gray-300 py-1 px-2 text-sm focus:outline-none focus:border-primary dark:border-gray-500 dark:bg-slate-800"
               />
-              <IoMdSearch className="absolute top-1/2 -translate-y-1/2 right-3 text-gray-500 dark:text-gray-300" />
+              <IoMdSearch className="text-slate-800 group-hover:text-primary absolute top-1/2 -translate-y-1/2 right-3" />
             </div>
 
             {/* Auth Buttons */}
@@ -126,17 +129,17 @@ export default function Navbar() {
             {/* Cart Button */}
             <button
               onClick={toggleCart}
-              className="relative flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-full hover:scale-105 transition-transform"
+              className="relative bg-gradient-to-r from-primary to-secondary text-white py-1 px-4 rounded-full flex items-center gap-2"
             >
               <FaCartShopping className="text-xl" />
               {cart.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-xs w-5 h-5 rounded-full flex items-center justify-center text-white">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-xs text-white rounded-full w-5 h-5 flex items-center justify-center">
                   {cart.length}
                 </span>
               )}
             </button>
 
-            {/* Dark Mode */}
+            {/* Dark Mode Toggle */}
             <DarkMode />
           </div>
         </div>
@@ -147,4 +150,3 @@ export default function Navbar() {
     </div>
   );
 }
-

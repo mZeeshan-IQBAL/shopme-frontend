@@ -9,13 +9,10 @@ export default function AdminOrders({ BACKEND_URL, token }) {
     setLoading(true);
     try {
       const res = await fetch(`${BACKEND_URL}/api/orders`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) throw new Error("Failed to fetch orders");
-
       const data = await res.json();
       setOrders(data);
     } catch (err) {
@@ -43,12 +40,9 @@ export default function AdminOrders({ BACKEND_URL, token }) {
 
       const { order } = await res.json();
 
-      // ✅ Functional update to avoid stale state
       setOrders((prevOrders) =>
         prevOrders.map((o) => (o._id === orderId ? { ...o, ...order } : o))
       );
-
-      console.log("✅ Status updated successfully:", order.status);
     } catch (err) {
       console.error("❌ Error updating order status:", err);
       alert("Failed to update status. Please try again.");
@@ -61,67 +55,71 @@ export default function AdminOrders({ BACKEND_URL, token }) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">📦 Orders</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">📦 Orders</h2>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="text-center py-4">
+          <p className="text-gray-500">Loading orders...</p>
+        </div>
       ) : orders.length === 0 ? (
-        <p>No orders found.</p>
+        <div className="text-center py-4 text-gray-500">No orders found.</div>
       ) : (
-        <table className="w-full border-collapse border border-gray-300 mt-4 text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2">Order ID</th>
-              <th className="border p-2">Customer</th>
-              <th className="border p-2">Email</th>
-              <th className="border p-2">Total</th>
-              <th className="border p-2">Status</th>
-              <th className="border p-2">Actions</th>
-              <th className="border p-2">Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td className="border p-2">{order._id.slice(-6)}</td>
-                <td className="border p-2">{order.name}</td>
-                <td className="border p-2">{order.email}</td>
-                <td className="border p-2">₹{order.totalPrice}</td>
-                <td className="border p-2">
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium
-                      ${order.status === 'delivered'
-                        ? 'bg-green-100 text-green-800'
-                        : order.status === 'cancelled'
-                        ? 'bg-red-100 text-red-800'
-                        : order.status === 'pending'
-                        ? 'bg-gray-100 text-gray-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                  >
-                    {order.status}
-                  </span>
-                </td>
-                <td className="border p-2">
-                  <select
-                    value={order.status}
-                    onChange={(e) => updateStatus(order._id, e.target.value)}
-                    className="p-1 border rounded text-sm"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </td>
-                <td className="border p-2">
-                  {new Date(order.createdAt).toLocaleString()}
-                </td>
+        <div className="overflow-x-auto rounded-lg shadow">
+          <table className="w-full bg-white border border-gray-200 rounded-lg text-sm">
+            <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
+              <tr>
+                <th className="px-4 py-3 text-left rounded-tl-lg">ID</th>
+                <th className="px-4 py-3 text-left">Customer</th>
+                <th className="px-4 py-3 text-left">Email</th>
+                <th className="px-4 py-3 text-left">Total</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">Actions</th>
+                <th className="px-4 py-3 text-left rounded-tr-lg">Date</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {orders.map((order) => (
+                <tr key={order._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-4 py-3 text-xs text-gray-600">{order._id.slice(-6)}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800">{order.name}</td>
+                  <td className="px-4 py-3 text-gray-600 text-sm">{order.email}</td>
+                  <td className="px-4 py-3 font-semibold">₹{order.totalPrice.toLocaleString()}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium
+                        ${order.status === 'delivered'
+                          ? 'bg-green-100 text-green-800'
+                          : order.status === 'cancelled'
+                          ? 'bg-red-100 text-red-800'
+                          : order.status === 'pending'
+                          ? 'bg-gray-100 text-gray-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <select
+                      value={order.status}
+                      onChange={(e) => updateStatus(order._id, e.target.value)}
+                      className="p-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {new Date(order.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

@@ -12,11 +12,14 @@ export default function Pagination({ currentPage, totalPages, onPageChange, onPr
   }
 
   return (
-    <div className="flex items-center justify-between mt-6">
+    <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
       <button
         onClick={onPrev}
         disabled={currentPage === 1}
-        className={`px-3 py-1 rounded ${currentPage === 1 ? 'text-gray-400' : 'bg-gray-200 hover:bg-gray-300'}`}
+        className={`flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+          ${currentPage === 1 
+            ? 'text-gray-400 cursor-not-allowed' 
+            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}`}
       >
         ← Previous
       </button>
@@ -24,14 +27,15 @@ export default function Pagination({ currentPage, totalPages, onPageChange, onPr
       <div className="flex gap-1">
         {pages.map((p, i) =>
           p === '...' ? (
-            <span key={i} className="px-3 py-1">...</span>
+            <span key={i} className="px-2 py-1 text-gray-500">...</span>
           ) : (
             <button
               key={i}
               onClick={() => onPageChange(p)}
-              className={`px-3 py-1 rounded text-sm ${
-                currentPage === p ? 'bg-primary text-white' : 'bg-white hover:bg-gray-200'
-              }`}
+              className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors
+                ${currentPage === p 
+                  ? 'bg-primary text-white' 
+                  : 'bg-white hover:bg-gray-200 text-gray-700 border border-gray-200'}`}
             >
               {p}
             </button>
@@ -42,7 +46,10 @@ export default function Pagination({ currentPage, totalPages, onPageChange, onPr
       <button
         onClick={onNext}
         disabled={currentPage === totalPages}
-        className={`px-3 py-1 rounded ${currentPage === totalPages ? 'text-gray-400' : 'bg-gray-200 hover:bg-gray-300'}`}
+        className={`flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors
+          ${currentPage === totalPages 
+            ? 'text-gray-400 cursor-not-allowed' 
+            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}`}
       >
         Next →
       </button>

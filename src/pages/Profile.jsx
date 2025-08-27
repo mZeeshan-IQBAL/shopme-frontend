@@ -104,6 +104,11 @@ export default function Profile() {
           >
             Logout
           </button>
+          <div className="text-center mt-4">
+            <Link to="/" className="text-gray-500 hover:underline text-sm">
+              ← Back to Store
+            </Link>
+          </div>
         </div>
 
         {/* User Info */}
@@ -168,11 +173,6 @@ export default function Profile() {
               ))}
             </div>
           )}
-          <div className="text-center mt-4">
-            <Link to="/" className="text-gray-500 hover:underline text-sm">
-              ← Back to Store
-            </Link>
-          </div>
         </div>
       </div>
     </div>

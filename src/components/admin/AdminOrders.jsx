@@ -25,9 +25,9 @@ export default function AdminOrders({ BACKEND_URL, token }) {
   const updateStatus = async (orderId, newStatus) => {
     try {
       const res = await fetch(`${BACKEND_URL}/api/orders/${orderId}/status`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status: newStatus }),
@@ -35,7 +35,7 @@ export default function AdminOrders({ BACKEND_URL, token }) {
 
       if (!res.ok) {
         const error = await res.json().catch(() => ({}));
-        throw new Error(error.message || 'Failed to update status');
+        throw new Error(error.message || "Failed to update status");
       }
 
       const { order } = await res.json();
@@ -79,21 +79,33 @@ export default function AdminOrders({ BACKEND_URL, token }) {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {orders.map((order) => (
-                <tr key={order._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 text-xs text-gray-600">{order._id.slice(-6)}</td>
-                  <td className="px-4 py-3 font-medium text-gray-800">{order.name}</td>
-                  <td className="px-4 py-3 text-gray-600 text-sm">{order.email}</td>
-                  <td className="px-4 py-3 font-semibold">₹{order.totalPrice.toLocaleString()}</td>
+                <tr
+                  key={order._id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-4 py-3 text-xs text-gray-600">
+                    {order._id.slice(-6)}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-gray-800">
+                    {order.name}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600 text-sm">
+                    {order.email}
+                  </td>
+                  <td className="px-4 py-3 font-semibold">
+                    ₹{order.totalPrice.toLocaleString()}
+                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-block px-2 py-1 rounded-full text-xs font-medium
-                        ${order.status === 'delivered'
-                          ? 'bg-green-100 text-green-800'
-                          : order.status === 'cancelled'
-                          ? 'bg-red-100 text-red-800'
-                          : order.status === 'pending'
-                          ? 'bg-gray-100 text-gray-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                        ${
+                          order.status === "delivered"
+                            ? "bg-green-100 text-green-800"
+                            : order.status === "cancelled"
+                            ? "bg-red-100 text-red-800"
+                            : order.status === "pending"
+                            ? "bg-gray-100 text-gray-800"
+                            : "bg-yellow-100 text-yellow-800"
                         }`}
                     >
                       {order.status}

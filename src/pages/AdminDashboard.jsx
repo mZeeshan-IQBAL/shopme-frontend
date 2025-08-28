@@ -5,8 +5,7 @@ import TopProductManagement from "../components/admin/TopProductManagement";
 import AdminOrders from "../components/admin/AdminOrders"; // ✅ new component
 
 const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL ||
-  "https://shopme-backend-production.up.railway.app";
+  import.meta.env.VITE_BACKEND_URL || 3000;
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("products");

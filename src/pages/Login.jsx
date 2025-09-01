@@ -29,7 +29,6 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        // Save token and redirect
         localStorage.setItem('token', data.token);
         navigate('/profile');
       } else {
@@ -88,6 +87,13 @@ export default function Login() {
             ) : 'Login'}
           </button>
         </form>
+
+        {/* ✅ Forgot Password Link */}
+        <div className="text-center mt-4">
+          <Link to="/forgot-password" className="text-primary hover:underline text-sm">
+            Forgot password?
+          </Link>
+        </div>
 
         <p className="text-center mt-6 text-gray-600 text-sm">
           Don’t have an account?{' '}

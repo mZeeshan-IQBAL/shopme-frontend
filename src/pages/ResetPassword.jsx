@@ -1,7 +1,6 @@
 // src/pages/ResetPassword.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom"; // ✅ Add this line
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -22,28 +21,33 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) return;
+    if (error) return;
 
     setLoading(true);
     setMessage('');
     setError('');
 
     try {
+      console.log("🔐 Resetting password for token:", token);
+
       const res = await fetch(`https://shopme-backend-production.up.railway.app/api/auth/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });
 
+      console.log("📡 Response status:", res.status);
       const data = await res.json();
+      console.log("📩 Response data:", data);
 
       if (res.ok) {
         setMessage(data.message);
         setTimeout(() => navigate('/login'), 3000);
       } else {
-        setError(data.error);
+        setError(data.error || 'Failed to reset password');
       }
     } catch (err) {
+      console.error("❌ Network error:", err);
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);

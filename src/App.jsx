@@ -1,7 +1,8 @@
 // src/App.jsx
 import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 // Main Components
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
